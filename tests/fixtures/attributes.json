@@ -1,0 +1,77 @@
+{
+ "products": [
+  {
+   "product_id": "20850",
+   "model": "171692",
+   "quantity": "4",
+   "stock_status_id": "5",
+   "name": "هندزفری بلوتوث اوی Awei T66 ENC",
+   "image": "https://static.masterkala.com/image/catalog/all-product/Images 13/Buy-Price-Awei-T66-ENC-Earbuds.jpg",
+   "slug": "Awei-T66-ENC-Earbuds",
+   "rating": 4
+  },
+  {
+   "product_id": "27144",
+   "model": "174103",
+   "quantity": "23",
+   "stock_status_id": "8",
+   "name": "هندزفری بلوتوث گرین لاین Green Lion Ocean GNOCNTWSBK",
+   "image": "https://static.masterkala.com/image/catalog/all-Product-new2/1/aw/buy-price-green-lion-ocean-gnocntwsbk-open-ear-headphones-008.jpg",
+   "slug": "green-lion-ocean-gnocntwsbk-open-ear-headphones",
+   "rating": 4
+  }
+ ],
+ "items": [
+  {
+   "attribute_group_id": 7,
+   "group_name": "مشخصات فیزیکی",
+   "attributes": [
+    {
+     "attribute_id": "29",
+     "name": "ابعاد",
+     "product_texts": {
+      "27144": "31*61*96 میلی‌متر"
+     }
+    },
+    {
+     "attribute_id": "12",
+     "name": "وزن",
+     "product_texts": {
+      "27144": "120 گرم",
+      "20850": "اعلام نشده"
+     }
+    }
+   ]
+  },
+  {
+   "attribute_group_id": 8,
+   "group_name": "مشخصات فنی",
+   "attributes": [
+    {
+     "attribute_id": "238",
+     "name": "نسخه‌ی بلوتوث",
+     "product_texts": {
+      "27144": "5.3",
+      "20850": "5.3"
+     }
+    },
+    {
+     "attribute_id": "268",
+     "name": "مدت زمان شارژ باتری برای پخش موسیقی",
+     "product_texts": {
+      "27144": "تا 6 ساعت",
+      "20850": "حدود 6 ساعت"
+     }
+    },
+    {
+     "attribute_id": "172",
+     "name": "نوع اتصال",
+     "product_texts": {
+      "27144": "بلوتوث",
+      "20850": "بلوتوث"
+     }
+    }
+   ]
+  }
+ ]
+}

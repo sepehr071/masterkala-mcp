@@ -1,0 +1,34 @@
+{
+ "debug": {
+  "tehran_shMethods": [
+   {
+    "key": "xshipping.xshipping1",
+    "value": "مَستر دلیوری ، سرویس تحویل سریع در شهر تهران ارسال رایگان سفارشات بالای 5 میلیون تومان - رایگان",
+    "cost": 0,
+    "title": "مَستر دلیوری ، سرویس تحویل سریع در شهر تهران ارسال رایگان سفارشات بالای 5 میلیون تومان",
+    "enable": true,
+    "detail": false,
+    "hint": false,
+    "sub_value": ""
+   }
+  ],
+  "tehran_address": [
+   {
+    "country_id": "101",
+    "zone_id": "1538",
+    "city_id": "305",
+    "latitude": "35.70038",
+    "longtitude": "51.32778"
+   },
+   "9499000.0000",
+   false,
+   false,
+   true,
+   "600.00000000",
+   false
+  ],
+  "free_shipping_price": 5000000,
+  "final_price": "9499000.0000"
+ },
+ "shipping_hint": "<p><b>نزدیک ترین بازه تحویل:</b><br /><span style=\"display: inline;\" class=\"ion-android-alert\"></span> ارسال تهران: <b>شنبه ۱۱ مهر 15:00 الی 18:00</b> ارسال <b>رایگان</b> <br /><span style=\"display: inline;\" class=\"ion-android-alert\"></span> ارسال شهرستان: تحویل به پست <b>فردا یکشنبه ۱۲ مهر</b> ارسال <b>رایگان</b></p>"
+}

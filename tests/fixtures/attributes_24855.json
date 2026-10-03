@@ -1,0 +1,36 @@
+{
+ "products": [
+  {
+   "product_id": "24855",
+   "model": "173090",
+   "quantity": "43",
+   "stock_status_id": "5",
+   "name": "هندزفری بلوتوث سی ام اف CMF Buds Pro 2",
+   "image": "https://static.masterkala.com/image/catalog/All-Product-New/21/ay/Buy-Price-CMF-Buds-Pro-2-Wireless-Earbuds-019.jpg",
+   "slug": "CMF-Buds-Pro-2-Wireless-Earbuds",
+   "rating": 4
+  }
+ ],
+ "items": [
+  {
+   "attribute_group_id": 7,
+   "group_name": "مشخصات فیزیکی",
+   "attributes": [
+    {
+     "attribute_id": "29",
+     "name": "ابعاد",
+     "product_texts": {
+      "24855": "53.4*53.4*23 میلی متر"
+     }
+    },
+    {
+     "attribute_id": "12",
+     "name": "وزن",
+     "product_texts": {
+      "24855": "55.8 گرم"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sepehr071/masterkala-mcp",
+  "title": "MasterKala",
+  "description": "Unofficial read-only MasterKala: search gadgets, compare prices and specs, stock, delivery, deals.",
+  "repository": {
+    "url": "https://github.com/sepehr071/masterkala-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/sepehr071/masterkala-mcp",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "masterkala-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "MASTERKALA_MCP_PROXY",
+          "description": "Optional HTTP proxy URL for requests to masterkala.com; system proxy settings are ignored.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

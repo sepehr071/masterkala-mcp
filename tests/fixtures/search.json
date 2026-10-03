@@ -1,0 +1,136 @@
+{
+ "link": false,
+ "count": "83",
+ "products": [
+  {
+   "product_id": "27035",
+   "name": "پاوربانک 10400 و جامپ استارتر شیائومی Xiaomi 70mai PS07",
+   "slug": "70mai-jump-starter-2-midrive-ps07",
+   "price": "18164000.0000",
+   "pricewithdiscount": "18164000.0000",
+   "percent": 0,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": {
+    "title": "امکان خرید حضوری",
+    "bg": "var(--v-primary-base)",
+    "color": "var(--v-primary-base)",
+    "special_price_color": "var(--v-primary-base)"
+   }
+  },
+  {
+   "product_id": "26976",
+   "name": "پاوربانک 20000 شیائومی گلوریمی Glorimi Activecore توان 45 وات با کابل متصل",
+   "slug": "glorimi-activecore-20000mah-power-bank-44-5w",
+   "price": "7470000.0000",
+   "pricewithdiscount": "7470000.0000",
+   "percent": 0,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": {
+    "title": "امکان خرید حضوری",
+    "bg": "var(--v-primary-base)",
+    "color": "var(--v-primary-base)",
+    "special_price_color": "var(--v-primary-base)"
+   }
+  },
+  {
+   "product_id": "26935",
+   "name": "پاوربانک 10000 شیائومی گلوریمی Glorimi LightCore توان 22.5 وات",
+   "slug": "glorimi-lightCore-power-10000-bank-22-5w",
+   "price": "4410000.0000",
+   "pricewithdiscount": "4188000.0000",
+   "percent": 5,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": false
+  },
+  {
+   "product_id": "26934",
+   "name": "پاوربانک 20000 شیائومی گلوریمی Glorimi LightCore توان 22.5 وات",
+   "slug": "glorimi-lightcore-power-bank-22-5w",
+   "price": "5789000.0000",
+   "pricewithdiscount": "5401000.0000",
+   "percent": 6,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": {
+    "title": "امکان خرید حضوری",
+    "bg": "var(--v-primary-base)",
+    "color": "var(--v-primary-base)",
+    "special_price_color": "var(--v-primary-base)"
+   }
+  },
+  {
+   "product_id": "16650",
+   "name": "کاور محافظ سیلیکونی پاوربانک 10000 شیائومی Xiaomi Mi Power Bank 3 50W PB1050ZM Silicon Cover Case",
+   "slug": "Xiaomi-PB1050ZM-Power-Bank-Silicone-Cover-Case",
+   "price": "145000.0000",
+   "pricewithdiscount": "145000.0000",
+   "percent": 0,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": false
+  },
+  {
+   "product_id": "16649",
+   "name": "کاور محافظ سیلیکونی پاوربانک 10000 شیائومی Xiaomi Mi Power Bank 2 PLM02ZM Silicon Cover Case",
+   "slug": "Xiaomi-PLM02ZM-PowerBank-Silicone-Cover-Case",
+   "price": "44500.0000",
+   "pricewithdiscount": "44500.0000",
+   "percent": 0,
+   "quantity": "1",
+   "stock_status": "موجود",
+   "hint": "",
+   "top_label": false
+  },
+  {
+   "product_id": "26977",
+   "name": "پاوربانک 20000 شیائومی Xiaomi Power Bank PB2020MI توان 22.5 وات با کابل متصل",
+   "slug": "xiaomi-powerbank-pb2020mi-20000mah-22-5w",
+   "price": 0,
+   "pricewithdiscount": 0,
+   "percent": 0,
+   "quantity": "0",
+   "stock_status": "موجود در شعب حضوری",
+   "hint": "",
+   "top_label": {
+    "title": "امکان خرید حضوری",
+    "bg": "var(--v-primary-base)",
+    "color": "var(--v-primary-base)",
+    "special_price_color": "var(--v-primary-base)"
+   }
+  },
+  {
+   "product_id": "24904",
+   "name": "پاوربانک 10000 شیائومی Xiaomi Power Bank PB1033MI توان 33 وات همراه با کابل متصل",
+   "slug": "Xiaomi-Power-Bank-PB1033MI-33W",
+   "price": 0,
+   "pricewithdiscount": 0,
+   "percent": 0,
+   "quantity": "0",
+   "stock_status": "موجود در شعب حضوری",
+   "hint": "",
+   "top_label": {
+    "title": "امکان خرید حضوری",
+    "bg": "var(--v-primary-base)",
+    "color": "var(--v-primary-base)",
+    "special_price_color": "var(--v-primary-base)"
+   }
+  }
+ ],
+ "sub": [],
+ "pages": [
+  {
+   "name": "پاوربانک Xiaomi",
+   "text": "پاوربانک Xiaomi",
+   "link": "/tag/22499/Xiaomi-Power-Bank",
+   "image": "https://static.masterkala.com/image/catalog/all-product/Images 1/Tags/xiaomi-powerbank.jpg"
+  }
+ ]
+}
