@@ -2,6 +2,8 @@
 
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/sepehr071/masterkala-mcp/main/.github/banner.png" alt="masterkala-mcp: let your AI agent find the cheapest gadget on MasterKala" width="100%">
+
 # 🎧 masterkala-mcp
 
 **Let your AI agent shop for gadgets on MasterKala.**<br>
@@ -11,7 +13,7 @@ read reviews, check stock and delivery dates, and catch today's discounts, all f
 [![PyPI](https://img.shields.io/pypi/v/masterkala-mcp?color=2563eb)](https://pypi.org/project/masterkala-mcp/)
 [![Python](https://img.shields.io/pypi/pyversions/masterkala-mcp)](https://pypi.org/project/masterkala-mcp/)
 [![CI](https://github.com/sepehr071/masterkala-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/sepehr071/masterkala-mcp/actions/workflows/ci.yml)
-[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.sepehr071%2Fmasterkala--mcp-7c3aed)](https://registry.modelcontextprotocol.io/v0/servers?search=masterkala-mcp)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.sepehr071%2Fmasterkala--mcp-7c3aed)](https://registry.modelcontextprotocol.io/?q=masterkala-mcp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)](https://github.com/sepehr071/masterkala-mcp/blob/main/LICENSE)
 
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=masterkala&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJtYXN0ZXJrYWxhLW1jcCJdfQ==)
@@ -167,7 +169,7 @@ There's no hosted server in between, no API key, and nothing about you is sent a
 | `mk_blog_comments` | Readers' questions on a post with the store writer's answers |
 </details>
 
-All tools are annotated `readOnlyHint: true` and return compact structured JSON, so they don't flood the agent's context.
+All 14 tools are annotated `readOnlyHint: true` and return compact structured JSON, so they don't flood the agent's context.
 
 ## Good to know
 
