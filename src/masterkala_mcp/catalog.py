@@ -353,6 +353,7 @@ def _search_product(p: dict[str, Any]) -> dict[str, Any]:
         "stock_status": (p.get("stock_status") or "").strip(),
         "label": label.get("title") if isinstance(label, dict) else None,
         "low_stock": p.get("hint") or None,
+        "image": p.get("image") or None,
         "url": f"{BASE}/product/{p['product_id']}/{p.get('slug') or 'x'}",
     }
 
@@ -378,6 +379,7 @@ def _cards(doc: str) -> list[dict[str, Any]]:
                 "discount_pct": int(pct) if pct else 0,
                 "in_stock": "out-of-stock" not in cls and final_price is not None,
                 "badges": [_text(b) for b in re.findall(r'class="tag-badge[^"]*"[^>]*>(.*?)</span>', body, re.S)],
+                "image": _first(r'<img src="(https://[^"]+)"', body),
                 "url": f"{BASE}/product/{pid}/{slug}",
             }
         )

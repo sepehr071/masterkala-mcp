@@ -75,6 +75,7 @@ async def mk_product(product_id: ProductId) -> dict[str, Any]:
         ],
         "description": item.get("description") or None,
         "image": (item.get("image") or [None])[0],
+        "images": (item.get("image") or [])[:4],
         "video": video.get("contentUrl"),
         "url": url,
     }
@@ -115,6 +116,7 @@ async def mk_specs(
                 "id": int(pid),
                 "title": products[pid].get("name"),
                 "stock_count": int(products[pid].get("quantity") or 0),
+                "image": (products[pid].get("image") or "").replace(" ", "%20") or None,
                 "url": f"{BASE}/product/{pid}/{products[pid].get('slug') or 'x'}",
             }
             for pid in map(str, product_ids)

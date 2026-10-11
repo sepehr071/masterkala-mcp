@@ -14,12 +14,14 @@ async def test_mk_product(client):
     assert data["brand"] == "CMF" and data["price"] > 0 and data["final_price"] <= data["price"]
     assert data["options"] and data["options"][0]["name"] == "color"
     assert "errors" not in data and data["stock_count"] >= 0
+    assert data["image"].startswith("https://") and 1 <= len(data["images"]) <= 4
     assert data["review_count"] >= 20 and 4 < data["rating"] <= 5  # reviews API, not the JSON-LD's floored 4
 
 
 async def test_mk_specs(client):
     data = await call(client, "mk_specs", {"product_ids": [27144, 20850]})
     assert [p["id"] for p in data["products"]] == [27144, 20850] and data["specs"]
+    assert all(p["image"].startswith("https://") for p in data["products"])
 
 
 async def test_mk_reviews(client):

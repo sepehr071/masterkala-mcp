@@ -31,6 +31,7 @@ when there are no reviews. Product ids are numbers like 24855. Persian queries m
 ('هندزفری', 'پاوربانک'), English brand/model names also work. There is no location API: shipping
 estimates are for Tehran (courier) and other cities (post); shipping is free from 5,000,000 Toman
 for most items, bulky ones never ship free (mk_shipping gives the exact rule per product).
+Products carry `image` (https URL; mk_product also has `images`).
 True cost = sum(final_price x qty) + shipping fee (0 above the product's free_shipping_from).
 """
 

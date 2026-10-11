@@ -22,6 +22,7 @@ async def test_mk_search(client, api):
         "stock_status": "موجود",
         "label": None,
         "low_stock": None,
+        "image": "https://masterkala.com/image/cache/catalog/test/26935-328x328.webp",
         "url": "https://masterkala.com/product/26935/glorimi-lightCore-power-10000-bank-22-5w",
     }
     # branch-only items have no online price
@@ -49,6 +50,7 @@ async def test_mk_find_cheapest(client, api):
         (27035, 18164000),
     ]
     assert [o["free_shipping"] for o in out["offers"]] == [False, True, True, True]
+    assert all(o["image"].startswith("https://") for o in out["offers"])
     assert out["scanned"] == 8 and out["complete"] and api.body()["limit"] == 500
 
 
@@ -113,6 +115,7 @@ async def test_mk_browse(client, api):
         "discount_pct": 0,
         "in_stock": True,
         "badges": ["فقط 2 عدد مونده!"],
+        "image": "https://masterkala.com/image/cache/catalog/All-Product-New/22/an/Buy-Price-Awei-Awei-T87-TWS-Earbuds-Wireless-Headphones-003-328x328.webp",
         "url": "https://masterkala.com/product/25016/Awei-T87-TWS-Earbuds-Wireless-Headphones",
     }
     assert [p["in_stock"] for p in out["products"]] == [True, True, True, False, False]
@@ -201,6 +204,7 @@ async def test_mk_deals(client, api):
     out = (await client.call_tool("mk_deals", {"limit": 3})).structured_content
     assert out["ends_in_seconds"] == 50340 and out["count"] == 4
     assert [(d["id"], d["discount_pct"]) for d in out["deals"]] == [(24855, 20), (27034, 20), (25491, 12)]
+    assert all(d["image"].startswith("https://") for d in out["deals"])
     assert out["deals"][0]["price"] == 11900000 and out["deals"][0]["final_price"] == 9499000
 
 

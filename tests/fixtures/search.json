@@ -17,7 +17,8 @@
     "bg": "var(--v-primary-base)",
     "color": "var(--v-primary-base)",
     "special_price_color": "var(--v-primary-base)"
-   }
+   },
+   "image": "https://masterkala.com/image/cache/catalog/test/27035-328x328.webp"
   },
   {
    "product_id": "26976",
@@ -34,7 +35,8 @@
     "bg": "var(--v-primary-base)",
     "color": "var(--v-primary-base)",
     "special_price_color": "var(--v-primary-base)"
-   }
+   },
+   "image": "https://masterkala.com/image/cache/catalog/test/26976-328x328.webp"
   },
   {
    "product_id": "26935",
@@ -46,7 +48,8 @@
    "quantity": "1",
    "stock_status": "موجود",
    "hint": "",
-   "top_label": false
+   "top_label": false,
+   "image": "https://masterkala.com/image/cache/catalog/test/26935-328x328.webp"
   },
   {
    "product_id": "26934",
@@ -63,7 +66,8 @@
     "bg": "var(--v-primary-base)",
     "color": "var(--v-primary-base)",
     "special_price_color": "var(--v-primary-base)"
-   }
+   },
+   "image": "https://masterkala.com/image/cache/catalog/test/26934-328x328.webp"
   },
   {
    "product_id": "16650",
@@ -75,7 +79,8 @@
    "quantity": "1",
    "stock_status": "موجود",
    "hint": "",
-   "top_label": false
+   "top_label": false,
+   "image": "https://masterkala.com/image/cache/catalog/test/16650-328x328.webp"
   },
   {
    "product_id": "16649",
@@ -87,7 +92,8 @@
    "quantity": "1",
    "stock_status": "موجود",
    "hint": "",
-   "top_label": false
+   "top_label": false,
+   "image": "https://masterkala.com/image/cache/catalog/test/16649-328x328.webp"
   },
   {
    "product_id": "26977",
@@ -104,7 +110,8 @@
     "bg": "var(--v-primary-base)",
     "color": "var(--v-primary-base)",
     "special_price_color": "var(--v-primary-base)"
-   }
+   },
+   "image": "https://masterkala.com/image/cache/catalog/test/26977-328x328.webp"
   },
   {
    "product_id": "24904",
@@ -121,7 +128,8 @@
     "bg": "var(--v-primary-base)",
     "color": "var(--v-primary-base)",
     "special_price_color": "var(--v-primary-base)"
-   }
+   },
+   "image": "https://masterkala.com/image/cache/catalog/test/24904-328x328.webp"
   }
  ],
  "sub": [],

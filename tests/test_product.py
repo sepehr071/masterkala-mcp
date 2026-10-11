@@ -25,6 +25,7 @@ async def test_mk_product(client, api):
     assert colors["name"] == "color" and {v["name"] for v in colors["values"]} == {"سفید", "آبی", "مشکی"}
     assert all(v["available"] for v in colors["values"]) and p["options"][1]["name"] == "warranty"
     assert p["branches"] == [] and p["video"].endswith("407.mp4")
+    assert p["image"].startswith("https://") and p["images"][0] == p["image"] and len(p["images"]) <= 4
     assert {"productids": ["24855"], "compare": "1"} in [api.body(i) for i in (1, 2)]
 
 
@@ -72,6 +73,7 @@ async def test_mk_specs(client, api):
         "name": "وزن",
         "values": {"27144": "120 گرم", "20850": "اعلام نشده"},
     }
+    assert all(p["image"].startswith("https://") and " " not in p["image"] for p in out["products"])
     assert len(out["specs"]) == 5 and api.body() == {"productids": ["27144", "20850"], "compare": "1"}
     assert "not_found" not in out
     out = (await client.call_tool("mk_specs", {"product_ids": [27144, 9999999]})).structured_content
