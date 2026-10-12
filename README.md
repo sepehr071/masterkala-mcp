@@ -2,13 +2,13 @@
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/sepehr071/masterkala-mcp/main/.github/banner.png" alt="masterkala-mcp: let your AI agent find the cheapest gadget on MasterKala" width="100%">
+<img src="https://raw.githubusercontent.com/sepehr071/masterkala-mcp/main/.github/banner.png" alt="masterkala-mcp: unofficial MasterKala MCP server for Claude, Cursor and Copilot" width="100%">
 
-# 🎧 masterkala-mcp
+# masterkala-mcp: MasterKala MCP server for AI agents
 
-**Let your AI agent shop for gadgets on MasterKala.**<br>
-Search earbuds, chargers, power banks and smart watches, compare real prices and specs,<br>
-read reviews, check stock and delivery dates, and catch today's discounts, all from Claude, Cursor or Copilot.
+**Let your AI agent shop for gadgets on MasterKala (مسترکالا).**<br>
+An unofficial, read-only MCP server for the Iranian gadget and mobile accessories shop: search earbuds, chargers,<br>
+power banks and smart watches, compare real prices and specs, read reviews, check stock and delivery dates, and catch today's discounts, all from Claude, Cursor or Copilot.
 
 [![PyPI](https://img.shields.io/pypi/v/masterkala-mcp?color=2563eb)](https://pypi.org/project/masterkala-mcp/)
 [![Python](https://img.shields.io/pypi/pyversions/masterkala-mcp)](https://pypi.org/project/masterkala-mcp/)
@@ -19,11 +19,25 @@ read reviews, check stock and delivery dates, and catch today's discounts, all f
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=masterkala&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJtYXN0ZXJrYWxhLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_masterkala--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=masterkala&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22masterkala-mcp%22%5D%7D)
 
-[Quick start](#quick-start) · [What it can do](#what-it-can-do) · [Tools](#tools) · [FAQ](#faq) · [فارسی](#فارسی)
+[For AI agents](#for-ai-agents) · [Quick start](#quick-start) · [What it can do](#what-it-can-do) · [Tools](#tools) · [FAQ](#faq) · [فارسی](#فارسی)
 
 </div>
 
 ---
+
+## For AI agents
+
+- **What:** unofficial MCP server for MasterKala (masterkala.com, Iran), a gadget and mobile accessories shop. Queries in Persian or English; prices in Toman.
+- **Install:** `uvx masterkala-mcp` or `claude mcp add masterkala -- uvx masterkala-mcp`. Transport: stdio. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.10+).
+- **Auth:** none, no API key or account. Optional `MASTERKALA_MCP_PROXY` (HTTP proxy for requests to masterkala.com).
+- **Access:** read-only. No login, cart, orders or posting reviews, so no confirmation is needed before calling any tool.
+- **Tools:** 14, all prefixed `mk_`. Start with `mk_find_cheapest`, `mk_search`, `mk_deals`, `mk_browse`.
+  Typical sequence: `mk_find_cheapest` -> `mk_product` -> `mk_shipping`.
+- **Use when:** finding the cheapest orderable item, comparing specs, or checking stock and delivery on MasterKala.
+- **Do not use when:** the user wants to buy. Delivery is an estimate for Tehran and "other cities by post", based on a default Tehran address.
+- **Output:** compact JSON. Prices in Toman (`final_price` is what you pay), ratings 1-5 (`null` = no reviews). Numeric product ids pass between tools.
+- **Machine-readable:** [`server.json`](https://github.com/sepehr071/masterkala-mcp/blob/main/server.json) and the
+  [awesome-iran-mcp catalog](https://github.com/sepehr071/awesome-iran-mcp) (`TOOLS.md`, `servers.json`, `llms.txt`).
 
 ## Why
 
@@ -183,6 +197,27 @@ All 14 tools are annotated `readOnlyHint: true` and return compact structured JS
 ## FAQ
 
 <details>
+<summary><b>Is there a MasterKala API or MCP server for AI agents?</b></summary>
+
+Yes: `masterkala-mcp` is an unofficial MCP server with 14 read-only tools for search, prices, specs, reviews,
+delivery and deals. It calls the same public endpoints the masterkala.com website uses; no API key is needed.
+</details>
+
+<details>
+<summary><b>How do I use MasterKala with Claude, Cursor or Copilot?</b></summary>
+
+Add the server with `claude mcp add masterkala -- uvx masterkala-mcp` (or the matching config in
+[Quick start](#quick-start) for Claude Desktop, Cursor and VS Code), then ask in plain language, in Persian or English.
+</details>
+
+<details>
+<summary><b>Is it official, safe and free?</b></summary>
+
+It is unofficial and not affiliated with MasterKala. It is read-only (no login, cart or payment), runs on your
+machine, and is free under the MIT license.
+</details>
+
+<details>
 <summary><b>Can it place an order for me?</b></summary>
 
 No, and that's deliberate. It has no login and never touches the cart, order, payment, wishlist or review endpoints.
@@ -225,11 +260,13 @@ npx @modelcontextprotocol/inspector uvx masterkala-mcp
 |---|---|---|
 | `MASTERKALA_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port` |
 
-## فارسی
+<a id="فارسی"></a>
+
+## فارسی: سرور MCP مسترکالا
 
 <div dir="rtl">
 
-**masterkala-mcp** به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در مسترکالا جستجو کند،
+**masterkala-mcp** یک سرور MCP غیررسمی و فقط&zwnj;خواندنی برای مسترکالا، فروشگاه اینترنتی گجت و لوازم جانبی موبایل در ایران، است. این سرور به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در مسترکالا جستجو کند،
 ارزان&zwnj;ترین کالای موجود را پیدا کند، مشخصات و نظرات را مقایسه کند و زمان و هزینه ارسال و تخفیف&zwnj;های روز را ببیند.
 
 - فقط خواندنی است: وارد حساب نمی&zwnj;شود، سبد خرید نمی&zwnj;سازد، سفارش ثبت نمی&zwnj;کند و نظر نمی&zwnj;فرستد.
@@ -266,6 +303,12 @@ docstring that tells the agent when to use it. Issues and PRs are welcome, espec
 Releases: bump the version in `pyproject.toml` and `server.json`, then push a `v*` tag. GitHub Actions tests,
 publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.io), and creates the GitHub Release.
 
+## Related servers
+
+- [Digikala MCP server](https://github.com/sepehr071/digikala-mcp) for Iran's largest online store
+- [Technolife MCP server](https://github.com/sepehr071/technolife-mcp) for electronics prices, with installment prices
+- [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp): catalog of all Iranian-service MCP servers
+
 ## Disclaimer
 
 Unofficial and not affiliated with or endorsed by MasterKala. It uses the public endpoints of the masterkala.com
@@ -274,3 +317,5 @@ website, which can change without notice. Please keep request rates reasonable.
 ## License
 
 [MIT](https://github.com/sepehr071/masterkala-mcp/blob/main/LICENSE)
+
+If this saves you clicks, a star helps others find it.
