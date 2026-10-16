@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 import httpx
@@ -27,6 +29,23 @@ MAX_CONCURRENCY = 4
 _transport: httpx.AsyncBaseTransport | None = None
 _client: httpx.AsyncClient | None = None
 _limit: asyncio.Semaphore | None = None
+CACHE_TTL = 3600  # seconds, for near-static parsed lists (categories, brands)
+_cache: dict[str, tuple[float, Any]] = {}
+
+
+async def cached(key: str, build: Callable[[], Awaitable[Any]]) -> Any:
+    """Return `build()` for `key`, reusing the result for CACHE_TTL seconds. Callers must not mutate it."""
+    hit = _cache.get(key)
+    if hit and time.monotonic() - hit[0] < CACHE_TTL:
+        return hit[1]
+    value = await build()
+    _cache[key] = (time.monotonic(), value)
+    return value
+
+
+def clip(text: str, n: int = 400, full: bool = False) -> str:
+    """Cut untrusted site text to n characters, marking the cut. full=True keeps all of it."""
+    return text if full or len(text) <= n else text[:n].rstrip() + "…[truncated]"
 
 
 class ApiError(ToolError):
@@ -37,6 +56,7 @@ def set_transport(transport: httpx.AsyncBaseTransport | None) -> None:
     """Swap the transport (tests use httpx.MockTransport). Drops the current client."""
     global _transport, _client, _limit
     _transport, _client, _limit = transport, None, None
+    _cache.clear()
 
 
 def _get_client() -> tuple[httpx.AsyncClient, asyncio.Semaphore]:

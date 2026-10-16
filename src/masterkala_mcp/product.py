@@ -11,7 +11,7 @@ from typing import Annotated, Any
 from pydantic import Field
 
 from .catalog import _first, _text
-from .http import BASE, ApiError, api, get_page
+from .http import BASE, ApiError, api, clip, get_page
 from .registry import tool
 
 ProductId = Annotated[
@@ -22,7 +22,10 @@ OPTION_NAMES = {"14": "color", "15": "warranty"}
 
 
 @tool("Product details")
-async def mk_product(product_id: ProductId) -> dict[str, Any]:
+async def mk_product(
+    product_id: ProductId,
+    full_text: Annotated[bool, Field(description="Return the description uncut (default cuts at 300 chars).")] = False,
+) -> dict[str, Any]:
     """Get one product's full record: price and discount (Toman), stock status and count, colors and
     which are buyable, brand, category path, rating, and the physical branches that have it.
 
@@ -73,12 +76,15 @@ async def mk_product(product_id: ProductId) -> dict[str, Any]:
                 _first(r'x-ref="shop_inventory_box">(.*?)<div\s+class="section-device-controller', doc) or "",
             )
         ],
-        "description": item.get("description") or None,
+        "description": clip(item["description"].strip(), 300, full_text) if item.get("description") else None,
         "image": (item.get("image") or [None])[0],
         "images": (item.get("image") or [])[:4],
         "video": video.get("contentUrl"),
         "url": url,
     }
+    for k in ("branches", "description", "video"):  # omit empty optional fields
+        if not result[k]:
+            del result[k]
     errors: list[str] = []
     stock, reviews = await asyncio.gather(
         _soft("stock_count", _attributes([product_id]), errors), _soft("rating", _reviews(product_id), errors)
@@ -140,6 +146,9 @@ async def mk_reviews(
     product_id: ProductId,
     stars: Annotated[int, Field(ge=0, le=5, description="Only reviews with this many stars (1-5); 0 = all.")] = 0,
     limit: Annotated[int, Field(ge=1, le=100, description="Max reviews to return, newest first.")] = 20,
+    full_text: Annotated[
+        bool, Field(description="Return review and reply text uncut (default cuts at 400 chars).")
+    ] = False,
 ) -> dict[str, Any]:
     """Read customer reviews of a product (1-5 stars, newest first) with the store's replies and the star breakdown.
 
@@ -148,11 +157,11 @@ async def mk_reviews(
     """
     body = await _reviews(product_id, 0, stars)
     count, rows = int(body.get("count") or 0), body.get("list") or []
-    while len(rows) < min(limit, count):  # the site sends at most 25 per page
-        more = (await _reviews(product_id, len(rows), stars)).get("list") or []
-        if not more:
-            break
-        rows += more
+    # page size = what the first page returned; fetch the other pages together (the client caps concurrency)
+    step = len(rows) or 1
+    pages = await asyncio.gather(*(_reviews(product_id, off, stars) for off in range(step, min(limit, count), step)))
+    for page in pages:
+        rows += page.get("list") or []
     # ponytail: pages are only roughly by date, so "newest" is among the fetched pages; fetch all if it matters.
     rows.sort(key=lambda r: r.get("date_added") or "", reverse=True)
     average, groups = _rating(body)
@@ -165,8 +174,8 @@ async def mk_reviews(
                 "author": (r.get("author") or "").strip(),
                 "rating": int(r.get("rating") or 0),
                 "date": r.get("date_added"),
-                "text": (r.get("text") or "").strip(),
-                "reply": (r.get("reply") or "").strip() or None,
+                "text": clip((r.get("text") or "").strip(), full=full_text),
+                "reply": clip((r.get("reply") or "").strip(), full=full_text) or None,
             }
             for r in rows[:limit]
         ],
@@ -177,9 +186,8 @@ async def mk_reviews(
 async def mk_shipping(product_id: ProductId) -> dict[str, Any]:
     """Get the nearest delivery slot and shipping fee for one product: Tehran courier and post to other cities.
 
-    Use for "when will it arrive / how much is shipping". Fees are Toman, 0 = free. Shipping is
-    free when the basket reaches free_shipping_from; null means this item never ships free
-    (bulky goods). same_day_seconds_left > 0 means an order placed now can still arrive today in
+    Use for "when will it arrive / how much is shipping". Fees are Toman, 0 = free; free above
+    free_shipping_from (null = never free). same_day_seconds_left > 0: can still arrive today in
     Tehran. Estimates use a default Tehran address.
     """
     errors: list[str] = []

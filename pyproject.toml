@@ -1,6 +1,6 @@
 [project]
 name = "masterkala-mcp"
-version = "0.2.2"
+version = "0.3.0"
 description = "Unofficial read-only MCP server for MasterKala: search gadgets and accessories, compare prices and specs, find deals."
 readme = "README.md"
 license = "MIT"

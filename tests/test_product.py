@@ -24,7 +24,7 @@ async def test_mk_product(client, api):
     colors = p["options"][0]
     assert colors["name"] == "color" and {v["name"] for v in colors["values"]} == {"سفید", "آبی", "مشکی"}
     assert all(v["available"] for v in colors["values"]) and p["options"][1]["name"] == "warranty"
-    assert p["branches"] == [] and p["video"].endswith("407.mp4")
+    assert "branches" not in p and p["video"].endswith("407.mp4")
     assert p["image"].startswith("https://") and p["images"][0] == p["image"] and len(p["images"]) <= 4
     assert {"productids": ["24855"], "compare": "1"} in [api.body(i) for i in (1, 2)]
 
@@ -157,3 +157,18 @@ async def test_mk_branches(client, api):
         "long": 51.412506,
     }
     assert len(out["branches"]) == 2
+
+
+async def test_mk_reviews_short_pages_and_full_text(client, api):
+    row = {**fixture("reviews.json")["list"][0], "text": "y" * 1000}
+
+    def pages(request):  # 10 per page, 25 reviews
+        start = json.loads(request.content)["from"]
+        return httpx.Response(200, json={"count": "25", "rating_group": [], "list": [row] * min(10, 25 - start)})
+
+    api["productreview/getproductreviews"] = pages
+    out = (await client.call_tool("mk_reviews", {"product_id": 1, "limit": 25})).structured_content
+    assert len(out["reviews"]) == 25 and [api.body(i)["from"] for i in (1, 2)] == [10, 20]
+    assert out["reviews"][0]["text"].endswith("[truncated]")
+    out = (await client.call_tool("mk_reviews", {"product_id": 1, "limit": 1, "full_text": True})).structured_content
+    assert out["reviews"][0]["text"] == "y" * 1000

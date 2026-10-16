@@ -6,8 +6,10 @@ from typing import Annotated, Any, Literal
 
 from pydantic import Field
 
-from .http import BASE, api
+from .http import BASE, api, clip
 from .registry import tool
+
+MAX_REPLIES = 3  # per thread; the rest are counted in `more_replies`
 
 BLOG_CATEGORIES = {
     "buying_guide": 63,
@@ -74,6 +76,9 @@ async def mk_blog_posts(
 async def mk_blog_comments(
     post_id: Annotated[int, Field(ge=1, le=1_000_000, description="Blog post id from mk_blog_posts, e.g. 330.")],
     limit: Annotated[int, Field(ge=1, le=20, description="Max comment threads to return, newest first.")] = 10,
+    full_text: Annotated[
+        bool, Field(description="Return comment text uncut and all replies (default: 400 chars, 3 replies).")
+    ] = False,
 ) -> dict[str, Any]:
     """Read the comments of a blog post as threads, with the store writer's answers as replies.
 
@@ -88,11 +93,14 @@ async def mk_blog_comments(
         item = {
             "author": (c.get("author") or "").strip(),
             "date": c.get("date_added"),
-            "text": (c.get("description") or "").strip(),
+            "text": clip((c.get("description") or "").strip(), full=full_text),
         }
         thread = thread_of.get(c.get("reply_to_review_id") or "0")
         if thread is not None:
-            thread["replies"].append(item)
+            if full_text or len(thread["replies"]) < MAX_REPLIES:
+                thread["replies"].append(item)
+            else:
+                thread["more_replies"] = thread.get("more_replies", 0) + 1
         else:
             thread = {**item, "replies": []}
             threads.append(thread)

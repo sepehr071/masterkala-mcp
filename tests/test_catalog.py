@@ -19,9 +19,6 @@ async def test_mk_search(client, api):
         "price": 4410000,
         "discount_pct": 5,
         "in_stock": True,
-        "stock_status": "موجود",
-        "label": None,
-        "low_stock": None,
         "image": "https://masterkala.com/image/cache/catalog/test/26935-328x328.webp",
         "url": "https://masterkala.com/product/26935/glorimi-lightCore-power-10000-bank-22-5w",
     }
@@ -191,6 +188,7 @@ async def test_mk_categories(client, api):
     assert len(out["categories"]) == 5  # deduplicated
     out = (await client.call_tool("mk_categories", {"query": "power"})).structured_content
     assert [c["id"] for c in out["categories"]] == [64]
+    assert len([c for c in api.calls if c.url.path == "/categories"]) == 1  # second call served from the TTL cache
 
 
 async def test_mk_brands(client, api):
@@ -211,3 +209,11 @@ async def test_mk_deals(client, api):
 async def test_query_too_short_rejected(client, api):
     result = await client.call_tool("mk_search", {"query": "x"})
     assert result.is_error and not api.calls
+
+
+async def test_mk_find_cheapest_in_stock_without_price(client, api):
+    data = fixture("search.json")
+    data["products"][0].update(pricewithdiscount="0", price="0")
+    api["product/searchproduct"] = data
+    out = (await client.call_tool("mk_find_cheapest", {"query": "پاوربانک شیائومی"})).structured_content
+    assert out["offers"]  # the unpriced item is skipped, no TypeError

@@ -190,7 +190,7 @@ All 14 tools are annotated `readOnlyHint: true` and return compact structured JS
 - **Prices are in Toman.** `final_price` is what you pay, `price` is before discount, `discount_pct` is a whole percent. The site's structured data is in Rial; the server converts it.
 - **Shipping is free from 5,000,000 Toman** per order for most items (bulky goods such as large speakers never ship free; `mk_shipping` gives `free_shipping_from: null` for them); below that, Tehran courier and post were 150,000 / 155,000 Toman on 2026-10-03. There is no address API, so `mk_shipping` estimates for Tehran and "other cities by post".
 - **Stock**: `in_stock` means orderable online now. Other statuses: ناموجود (sold out), به زودی (coming soon), موجود در شعب حضوری (only in the physical shops).
-- **Images**: every product has `image`, an absolute https URL (328 px webp from `mk_search`, `mk_find_cheapest` and `mk_browse`; 240 px from `mk_deals`; the original jpg from `mk_specs`). `mk_product` gives a 600 px `image` plus an `images` list (up to 4).
+- **Images**: every product has `image`, an absolute https URL (328 px webp from `mk_search`, `mk_find_cheapest` and `mk_browse`; 240 px from `mk_deals`; the original jpg from `mk_specs`). `mk_product` gives a 600 px `image` plus an `images` list (up to 4). Null/empty fields are omitted from results, `stock_status` only appears when it is not "موجود" (in stock), and review / comment text is cut to 400 characters (blog threads keep 3 replies, `more_replies` counts the rest).
 - **Ratings are 1–5**, `null` when nobody has reviewed the product yet.
 - **Persian queries match best** (`هندزفری`, `پاوربانک`), but English brand and model names work too (`xiaomi`, `Buds Pro`).
 

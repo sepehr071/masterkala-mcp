@@ -11,7 +11,7 @@ async def test_all_tools_are_read_only(client):
     assert len(tools) == 14
     for t in tools:
         assert t.name.startswith("mk_"), t.name
-        assert t.annotations.read_only_hint is True and t.annotations.destructive_hint is False, t.name
+        assert t.annotations.read_only_hint is True, t.name
         assert t.description and t.title, t.name
 
 

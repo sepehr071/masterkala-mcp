@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import Field
 
-from .http import BASE, ApiError, api, get_page, product_list
+from .http import BASE, ApiError, api, cached, get_page, product_list
 from .registry import tool
 
 Query = Annotated[
@@ -30,6 +30,7 @@ BrandSlug = Annotated[
 TagId = Annotated[int | None, Field(ge=1, description="Tag id from a /tag/<id>/ link in mk_search pages, e.g. 22246.")]
 
 FREE_SHIPPING_FROM = 5_000_000  # Toman, basket total
+IN_STOCK_TEXT = "موجود"  # stock_status of every buyable item; only other values are worth sending
 # First title words of add-ons sold for another product (cover, case, bag, screen glass, protector, strap, sticker).
 ACCESSORIES = {"کاور", "قاب", "کیف", "گلس", "محافظ", "بند", "برچسب"}
 
@@ -57,9 +58,8 @@ async def mk_search(
     """Search MasterKala products by keyword: price, discount and stock of each match.
 
     Use first for "price of X" / "do you have X". In-stock items come first. Also returns
-    matching categories (ids for mk_browse) and brand/tag pages. For the cheapest in-stock
-    match use mk_find_cheapest; to sort or filter a category use mk_browse; full details of one
-    product: mk_product.
+    matching categories (ids for mk_browse) and brand/tag pages. Cheapest: mk_find_cheapest.
+    One product: mk_product.
     """
     data = await _search(query, page * limit, limit)
     products = [_search_product(p) for p in data.get("products") or []]
@@ -98,11 +98,9 @@ async def mk_find_cheapest(
 ) -> dict[str, Any]:
     """Find the cheapest in-stock products for a keyword, one flat list sorted by payable price.
 
-    Use when the user wants the lowest price for X. Scans the search results, keeps items that
-    can be bought online now, and sorts by final_price (after discount, Toman). Most items ship
-    free when the basket reaches 5,000,000 Toman (free_shipping); bulky ones never do.
-    mk_shipping gives the exact fee and date. complete=false means in-stock items go on past
-    `scanned`: raise scan.
+    Use when the user wants the lowest price for X: scans the results, keeps items buyable online
+    now, sorts by final_price. free_shipping = basket reaches 5,000,000 Toman (bulky items never);
+    exact fee and date: mk_shipping. complete=false: in-stock items go past `scanned`, raise scan.
     """
     found: list[dict[str, Any]] = []
     while len(found) < scan:  # in-stock items come first: stop at the first page that reaches out-of-stock ones
@@ -122,9 +120,11 @@ async def mk_find_cheapest(
             continue
         offer = _search_product(p)
         # no_free_shipping "1": bulky items that never ship free.
-        offer["free_shipping"] = p.get("no_free_shipping") != "1" and (offer["final_price"] or 0) >= FREE_SHIPPING_FROM
+        offer["free_shipping"] = (
+            p.get("no_free_shipping") != "1" and (offer.get("final_price") or 0) >= FREE_SHIPPING_FROM
+        )
         offers.append(offer)
-    offers = [o for o in offers if o["final_price"]]
+    offers = [o for o in offers if o.get("final_price")]
     offers.sort(key=lambda o: o["final_price"])
     return {
         "scanned": len(found),
@@ -162,12 +162,9 @@ async def mk_browse(
 ) -> dict[str, Any]:
     """List the products of a category, brand or tag with sorting, price range and filters.
 
-    Use for "cheapest Bluetooth earbuds", "Xiaomi power banks between 1 and 2 million Toman",
-    "newest smart watches". Pass exactly one of category_id / brand / tag_id. Get category ids
-    from mk_categories or mk_search, brand slugs from mk_brands, and filter ids (brand, color,
-    attribute) plus the price range from mk_filters. For a keyword use mk_search or
-    mk_find_cheapest (the site ignores sorting on keyword listings). There is no rating sort:
-    check candidates with mk_reviews. Details: mk_product.
+    Use for "cheapest Bluetooth earbuds", "Xiaomi power banks between 1 and 2 million Toman".
+    Pass exactly one of category_id / brand / tag_id (ids: mk_categories, mk_brands, mk_search;
+    filter ids: mk_filters). No keyword or rating sort here: see mk_search / mk_reviews.
     """
     sources = {"cat": category_id, "manufacturer": brand, "tag": tag_id}
     if sum(v is not None for v in sources.values()) != 1:
@@ -222,10 +219,9 @@ async def mk_filters(
 ) -> dict[str, Any]:
     """List the filters of a category, brand or tag page (brands, colors, attributes) with their ids, and its price range.
 
-    Use before mk_browse when the user wants a brand, color or feature inside a category:
-    each group's options map filter id -> name; pass the ids as filter_ids. Long groups other than
-    brands are cut to 40 options (`omitted` says how many more); ask for that group to see all. max_price is
-    the most expensive item in the listing (Toman).
+    Use before mk_browse for a brand, color or feature filter: options map filter id -> name; pass
+    the ids as filter_ids. Non-brand groups are cut to 40 options (`omitted` = the rest): pass
+    `group` for all. max_price = most expensive item (Toman).
     """
     if sum(v is not None for v in (category_id, brand, tag_id)) != 1:
         raise ApiError("Pass exactly one of category_id, brand or tag_id.")
@@ -277,15 +273,7 @@ async def mk_categories(
     Use to get a category_id for mk_browse / mk_filters. mk_search also returns the
     categories matching a keyword.
     """
-    _, doc = await get_page("/categories")
-    seen: dict[str, dict[str, Any]] = {}
-    for cid, slug, label in re.findall(
-        r'href="(?:https://masterkala\.com)?/categories/(\d+)/products/([^"]*)"[^>]*>(.*?)</a>', doc, re.S
-    ):
-        title = _text(label)
-        if title and cid not in seen:
-            seen[cid] = {"id": int(cid), "title": title, "slug": slug}
-    categories = list(seen.values())
+    categories = await cached("categories", _all_categories)
     if query:
         q = _norm(query)
         categories = [c for c in categories if q in _norm(c["title"]) or q in c["slug"].lower()]
@@ -303,12 +291,7 @@ async def mk_brands(
 
     Use to get the brand slug for mk_browse / mk_filters ('anker-fa', 'mcdodo').
     """
-    _, doc = await get_page("/brand")
-    seen: dict[str, str] = {}
-    for slug, label in re.findall(r'href="(?:https://masterkala\.com)?/brand/([^"/?#]+)"[^>]*>(.*?)</a>', doc, re.S):
-        if _text(label) and slug not in seen:
-            seen[slug] = _text(label)
-    brands = [{"slug": s, "name": n} for s, n in seen.items()]
+    brands = await cached("brands", _all_brands)
     if query:
         q = _norm(query)
         brands = [b for b in brands if q in _norm(b["name"]) or q in b["slug"].lower()]
@@ -330,6 +313,27 @@ async def mk_deals(
     return {"ends_in_seconds": int(timer) if timer else None, "count": len(deals), "deals": deals[:limit]}
 
 
+async def _all_categories() -> list[dict[str, Any]]:
+    _, doc = await get_page("/categories")
+    seen: dict[str, dict[str, Any]] = {}
+    for cid, slug, label in re.findall(
+        r'href="(?:https://masterkala\.com)?/categories/(\d+)/products/([^"]*)"[^>]*>(.*?)</a>', doc, re.S
+    ):
+        title = _text(label)
+        if title and cid not in seen:
+            seen[cid] = {"id": int(cid), "title": title, "slug": slug}
+    return list(seen.values())
+
+
+async def _all_brands() -> list[dict[str, str]]:
+    _, doc = await get_page("/brand")
+    seen: dict[str, str] = {}
+    for slug, label in re.findall(r'href="(?:https://masterkala\.com)?/brand/([^"/?#]+)"[^>]*>(.*?)</a>', doc, re.S):
+        if _text(label) and slug not in seen:
+            seen[slug] = _text(label)
+    return [{"slug": s, "name": n} for s, n in seen.items()]
+
+
 async def _search(query: str, offset: int, limit: int) -> dict[str, Any]:
     data = await api(
         "product/searchproduct", {"v": "1.2", "query": query.strip(), "from": offset, "limit": limit, "filter": ""}
@@ -343,19 +347,21 @@ def _search_product(p: dict[str, Any]) -> dict[str, Any]:
     pct = int(p.get("percent") or 0)
     if final and price and final >= price:  # no offer: the site shows only final_price
         price, pct = final, 0
-    return {
+    status = (p.get("stock_status") or "").strip()
+    out = {
         "id": int(p["product_id"]),
         "title": (p.get("name") or "").strip(),
         "final_price": final,
         "price": price,
         "discount_pct": pct,
         "in_stock": p.get("quantity") == "1",
-        "stock_status": (p.get("stock_status") or "").strip(),
+        "stock_status": None if status == IN_STOCK_TEXT else status,
         "label": label.get("title") if isinstance(label, dict) else None,
         "low_stock": p.get("hint") or None,
         "image": p.get("image") or None,
         "url": f"{BASE}/product/{p['product_id']}/{p.get('slug') or 'x'}",
     }
+    return {k: v for k, v in out.items() if k in ("final_price", "price") or v not in (None, "")}
 
 
 def _cards(doc: str) -> list[dict[str, Any]]:
@@ -370,6 +376,7 @@ def _cards(doc: str) -> list[dict[str, Any]]:
         final, old = _first(r'font-bold"[^>]*>([\d,]+)<', body), _first(r"line-through[^>]*>([\d,]+)<", body)
         final_price = int(final.replace(",", "")) if final else None
         pct = _first(r">\s*(\d{1,2})٪\s*<", body)
+        badges = [_text(b) for b in re.findall(r'class="tag-badge[^"]*"[^>]*>(.*?)</span>', body, re.S)]
         cards.append(
             {
                 "id": int(pid),
@@ -378,7 +385,7 @@ def _cards(doc: str) -> list[dict[str, Any]]:
                 "price": int(old.replace(",", "")) if old else final_price,
                 "discount_pct": int(pct) if pct else 0,
                 "in_stock": "out-of-stock" not in cls and final_price is not None,
-                "badges": [_text(b) for b in re.findall(r'class="tag-badge[^"]*"[^>]*>(.*?)</span>', body, re.S)],
+                **({"badges": badges} if badges else {}),
                 "image": _first(r'<img src="(https://[^"]+)"', body),
                 "url": f"{BASE}/product/{pid}/{slug}",
             }
