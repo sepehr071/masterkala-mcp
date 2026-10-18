@@ -29,7 +29,7 @@ power banks and smart watches, compare real prices and specs, read reviews, chec
 
 - **What:** unofficial MCP server for MasterKala (masterkala.com, Iran), a gadget and mobile accessories shop. Queries in Persian or English; prices in Toman.
 - **Install:** `uvx masterkala-mcp` or `claude mcp add masterkala -- uvx masterkala-mcp`. Transport: stdio. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.10+).
-- **Auth:** none, no API key or account. Optional `MASTERKALA_MCP_PROXY` (HTTP proxy for requests to masterkala.com).
+- **Auth:** none, no API key or account. Optional `MASTERKALA_MCP_PROXY` (HTTP proxy, or a comma-separated list, for requests to masterkala.com).
 - **Access:** read-only. No login, cart, orders or posting reviews, so no confirmation is needed before calling any tool.
 - **Tools:** 14, all prefixed `mk_`. Start with `mk_find_cheapest`, `mk_search`, `mk_deals`, `mk_browse`.
   Typical sequence: `mk_find_cheapest` -> `mk_product` -> `mk_shipping`.
@@ -236,8 +236,9 @@ in-stock items lie past that, so raise `scan` (up to 1500). `mk_search` shows ev
 <details>
 <summary><b>I get "Could not reach masterkala.com"</b></summary>
 
-The server retries a dropped connection once. If it still fails, check your internet connection. System proxy
-variables are ignored on purpose; set `MASTERKALA_MCP_PROXY` if you need a proxy.
+The server retries a dropped connection twice. If it still fails, check your internet connection. System proxy
+variables are ignored on purpose; set `MASTERKALA_MCP_PROXY` if you need a proxy. If the shop shows a bot-check page, install the browser extra
+(`pip install "masterkala-mcp[browser]"`, then `patchright install chromium`) and the server clears it once.
 </details>
 
 <details>
@@ -258,7 +259,7 @@ npx @modelcontextprotocol/inspector uvx masterkala-mcp
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `MASTERKALA_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port` |
+| `MASTERKALA_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port`. A comma-separated list is used one at a time: the next proxy takes over when one is blocked or cannot connect |
 
 <a id="فارسی"></a>
 
@@ -292,8 +293,8 @@ claude mcp add masterkala -- uvx masterkala-mcp
 ```bash
 git clone https://github.com/sepehr071/masterkala-mcp && cd masterkala-mcp
 uv sync
-uv run pytest            # offline, against recorded responses
-uv run pytest -m live    # real masterkala.com
+uv run python -m pytest          # offline, against recorded responses
+uv run python -m pytest -m live  # real masterkala.com
 uv run ruff check .
 ```
 

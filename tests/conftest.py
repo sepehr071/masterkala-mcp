@@ -30,6 +30,12 @@ def fresh_http_client():
     http.set_transport(None)
 
 
+@pytest.fixture(autouse=True)
+def no_jitter(monkeypatch):
+    monkeypatch.setattr(http, "JITTER", (0, 0))
+    monkeypatch.setattr(http, "RETRY_DELAY", 0)
+
+
 @pytest.fixture
 def api():
     """Route table for a fake masterkala.com.
