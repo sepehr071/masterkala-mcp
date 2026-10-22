@@ -7,7 +7,7 @@
 # masterkala-mcp: MasterKala MCP server for AI agents
 
 **Let your AI agent shop for gadgets on MasterKala (مسترکالا).**<br>
-An unofficial, read-only MCP server for the Iranian gadget and mobile accessories shop: search earbuds, chargers,<br>
+An unofficial, read-only MCP server for [MasterKala](https://masterkala.com), the Iranian gadget and mobile accessories shop: search earbuds, chargers,<br>
 power banks and smart watches, compare real prices and specs, read reviews, check stock and delivery dates, and catch today's discounts, all from Claude, Cursor or Copilot.
 
 [![PyPI](https://img.shields.io/pypi/v/masterkala-mcp?color=2563eb)](https://pypi.org/project/masterkala-mcp/)
@@ -19,7 +19,7 @@ power banks and smart watches, compare real prices and specs, read reviews, chec
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=masterkala&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJtYXN0ZXJrYWxhLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_masterkala--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=masterkala&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22masterkala-mcp%22%5D%7D)
 
-[For AI agents](#for-ai-agents) · [Quick start](#quick-start) · [What it can do](#what-it-can-do) · [Tools](#tools) · [FAQ](#faq) · [فارسی](#فارسی)
+[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [How it works](#how-it-works) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers)
 
 </div>
 
@@ -27,15 +27,15 @@ power banks and smart watches, compare real prices and specs, read reviews, chec
 
 ## For AI agents
 
-- **What:** unofficial MCP server for MasterKala (masterkala.com, Iran), a gadget and mobile accessories shop. Queries in Persian or English; prices in Toman.
+- **What:** unofficial MCP server (model context protocol) for MasterKala (masterkala.com, Iran), a gadget and mobile accessories shop that sells its own stock. Queries in Persian or English; prices in Toman.
 - **Install:** `uvx masterkala-mcp` or `claude mcp add masterkala -- uvx masterkala-mcp`. Transport: stdio. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.10+).
-- **Auth:** none, no API key or account. Optional `MASTERKALA_MCP_PROXY` (HTTP proxy, or a comma-separated list, for requests to masterkala.com).
-- **Access:** read-only. No login, cart, orders or posting reviews, so no confirmation is needed before calling any tool.
+- **Auth:** none, no API key or account. Optional `MASTERKALA_MCP_PROXY` (HTTP proxy URL, or a comma-separated list, for requests to masterkala.com); system proxy settings are ignored.
+- **Access:** read-only. It cannot log in, use the cart, place orders or post reviews, so no confirmation is needed before calling any tool.
 - **Tools:** 14, all prefixed `mk_`. Start with `mk_find_cheapest`, `mk_search`, `mk_deals`, `mk_browse`.
   Typical sequence: `mk_find_cheapest` -> `mk_product` -> `mk_shipping`.
-- **Use when:** finding the cheapest orderable item, comparing specs, or checking stock and delivery on MasterKala.
-- **Do not use when:** the user wants to buy. Delivery is an estimate for Tehran and "other cities by post", based on a default Tehran address.
-- **Output:** compact JSON. Prices in Toman (`final_price` is what you pay), ratings 1-5 (`null` = no reviews). Numeric product ids pass between tools.
+- **Use when:** the user wants the cheapest orderable item, a spec or price comparison, reviews, stock, a delivery estimate, current discounts or a MasterKala buying guide.
+- **Do not use when:** the user wants to buy (the agent finds the item, the user orders on masterkala.com), needs another shop, or needs delivery to a specific address: delivery is an estimate for Tehran and "other cities by post", based on a default Tehran address.
+- **Output:** compact JSON. Prices in **Toman** (`final_price` is what you pay), ratings 1-5 (`null` = no reviews). Numeric product ids pass between tools.
 - **Machine-readable:** [`server.json`](https://github.com/sepehr071/masterkala-mcp/blob/main/server.json) and the
   [awesome-iran-mcp catalog](https://github.com/sepehr071/awesome-iran-mcp) (`TOOLS.md`, `servers.json`, `llms.txt`).
 
@@ -63,13 +63,25 @@ An agent with `masterkala-mcp` does that in seconds:
 
 ## What it can do
 
-- 🔎 **Search** products by name in Persian or English, with price, discount and stock
-- 💸 **Find the cheapest** in-stock match, with cases and covers filtered out
-- 🗂️ **Browse** any category, brand or tag sorted by price, stock or date, with price range and brand/color filters
-- 📋 **Read** full product details: colors, stock count, specs, side-by-side comparison, reviews
-- 🚚 **Check delivery**: next Tehran courier slot, post to other cities, shipping fee, same-day cut-off
-- ⚡ **Catch deals** on the discount page, plus buying guides from the MasterKala blog
-- 🔒 **Read-only by design**: no login, no cart, no orders, no reviews posted
+- **Search** products by name in Persian or English, with price, discount and stock
+- **Find the cheapest** in-stock match, with cases and covers filtered out
+- **Browse** any category, brand or tag sorted by price, stock or date, with price range and brand/color filters
+- **Read** full product details: colors, stock count, specs, side-by-side comparison, reviews
+- **Check delivery**: next Tehran courier slot, post to other cities, shipping fee, same-day cut-off
+- **Catch deals** on the discount page, plus buying guides and readers' questions from the MasterKala blog
+- **Find a shop**: the physical MasterKala branches in Tehran with address, phone and map location
+- **Read-only by design**: no login, no cart, no orders, no reviews posted
+
+Example prompts:
+
+- "Cheapest Bluetooth earbuds between 3 and 5 million Toman, and which one has the best reviews?"
+- "Compare the specs of the Green Lion Ocean and the Awei T66."
+- "Is the blue CMF Buds Pro 2 in stock? When would it reach Tehran?"
+- "What are today's biggest discounts on smart watches?"
+- "Where are MasterKala's physical shops in Tehran?"
+- <span dir="rtl">بهترین تخفیف&zwnj;های امروز مسترکالا روی پاوربانک چیه؟</span>
+- <span dir="rtl">ارزان&zwnj;ترین هندزفری بلوتوث موجود را پیدا کن و بگو کی به تهران می&zwnj;رسد.</span>
+- <span dir="rtl">مشخصات دو ساعت هوشمند را کنار هم مقایسه کن و نظر خریداران را بگو.</span>
 
 ## Quick start
 
@@ -100,7 +112,7 @@ Settings → Developer → Edit Config, then add:
 <details>
 <summary><b>Cursor</b></summary>
 
-Click **Install in Cursor** above, or add the Claude Desktop block to `~/.cursor/mcp.json`.
+Click **Install in Cursor** above, or add the Claude Desktop block to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project).
 </details>
 
 <details>
@@ -118,17 +130,87 @@ Click **Install in VS Code** above, or add to `.vscode/mcp.json`:
 </details>
 
 <details>
+<summary><b>Codex CLI</b></summary>
+
+```bash
+codex mcp add masterkala -- uvx masterkala-mcp
+```
+
+Or in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.masterkala]
+command = "uvx"
+args = ["masterkala-mcp"]
+```
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "masterkala": { "command": "uvx", "args": ["masterkala-mcp"] }
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Add the Claude Desktop block to `~/.codeium/windsurf/mcp_config.json`.
+</details>
+
+<details>
 <summary><b>Anything else</b></summary>
 
 It's a standard stdio MCP server: run `uvx masterkala-mcp`, or `pip install masterkala-mcp` and run `masterkala-mcp`.
 </details>
 
-Then just ask:
+## Tools
 
-- "Cheapest Bluetooth earbuds between 3 and 5 million Toman, and which one has the best reviews?"
-- "Compare the specs of the Green Lion Ocean and the Awei T66."
-- "Is the blue CMF Buds Pro 2 in stock? When would it reach Tehran?"
-- <span dir="rtl">بهترین تخفیف&zwnj;های امروز مسترکالا روی پاوربانک چیه؟</span>
+All tools are prefixed `mk_`. Product ids are numbers like `24855`; category ids come from `mk_categories`, brand slugs from `mk_brands`.
+
+<details open>
+<summary><b>Find products</b> (7)</summary>
+
+| Tool | What it does |
+|---|---|
+| `mk_search` | Search by keyword: price, discount, stock, plus matching categories and tag pages |
+| `mk_find_cheapest` | Cheapest in-stock matches for a keyword, one flat list sorted by payable price (accessories filtered out) |
+| `mk_browse` | A category, brand or tag sorted by price / stock / date, with price range and filters |
+| `mk_filters` | Brand, color and feature filter ids and the price range of a category, brand or tag |
+| `mk_categories` | Product categories and their ids (about 100 main categories) |
+| `mk_brands` | Brands and their slugs (about 135) |
+| `mk_deals` | Everything on the discount page, biggest discount first, with the time left |
+</details>
+
+<details open>
+<summary><b>One product</b> (5)</summary>
+
+| Tool | What it does |
+|---|---|
+| `mk_product` | Price, discount, stock status and count, colors, brand, category, rating, shops that have it |
+| `mk_specs` | Specification table of 1-4 products side by side |
+| `mk_reviews` | Customer reviews with star breakdown and the store's replies |
+| `mk_shipping` | Next delivery slot and fee for Tehran and other cities, same-day cut-off |
+| `mk_branches` | MasterKala's physical shops in Tehran with address, phone and map location |
+</details>
+
+<details open>
+<summary><b>Blog</b> (2)</summary>
+
+| Tool | What it does |
+|---|---|
+| `mk_blog_posts` | Buying guides, comparisons and how-tos, newest first |
+| `mk_blog_comments` | Readers' questions on a post with the store writer's answers |
+</details>
+
+All 14 tools are annotated `readOnlyHint: true` and return compact JSON, so they don't flood the agent's context.
 
 ## How it works
 
@@ -145,45 +227,9 @@ Then just ask:
 
 `masterkala-mcp` runs locally and calls the same public endpoints the masterkala.com website uses.
 There's no hosted server in between, no API key, and nothing about you is sent anywhere else.
-
-## Tools
-
-<details open>
-<summary><b>🔎 Find products</b> (7)</summary>
-
-| Tool | What it does |
-|---|---|
-| `mk_search` | Search by keyword: price, discount, stock, plus matching categories and tag pages |
-| `mk_find_cheapest` | Cheapest in-stock matches for a keyword, one flat list (accessories filtered out) |
-| `mk_browse` | A category, brand or tag sorted by price / stock / date, with price range and filters |
-| `mk_filters` | Brand, color and feature filter ids and the price range of a category, brand or tag |
-| `mk_categories` | Product categories and their ids |
-| `mk_brands` | Brands and their slugs |
-| `mk_deals` | Everything on the discount page, biggest discount first, with the time left |
-</details>
-
-<details open>
-<summary><b>📦 One product</b> (5)</summary>
-
-| Tool | What it does |
-|---|---|
-| `mk_product` | Price, discount, stock status and count, colors, brand, category, rating, shops that have it |
-| `mk_specs` | Specification table of 1-4 products side by side |
-| `mk_reviews` | Customer reviews with star breakdown and the store's replies |
-| `mk_shipping` | Next delivery slot and fee for Tehran and other cities, same-day cut-off |
-| `mk_branches` | MasterKala's physical shops with address, phone and map location |
-</details>
-
-<details open>
-<summary><b>📝 Blog</b> (2)</summary>
-
-| Tool | What it does |
-|---|---|
-| `mk_blog_posts` | Buying guides, comparisons and how-tos, newest first |
-| `mk_blog_comments` | Readers' questions on a post with the store writer's answers |
-</details>
-
-All 14 tools are annotated `readOnlyHint: true` and return compact structured JSON, so they don't flood the agent's context.
+Requests go out through a Chrome-impersonating HTTP client, at most 2 at a time with a short random delay, and a dropped
+connection is retried up to twice. The category and brand lists are cached for an hour. Review, comment and description
+text is treated as untrusted site content and cut to a short length.
 
 ## Good to know
 
@@ -193,6 +239,10 @@ All 14 tools are annotated `readOnlyHint: true` and return compact structured JS
 - **Images**: every product has `image`, an absolute https URL (328 px webp from `mk_search`, `mk_find_cheapest` and `mk_browse`; 240 px from `mk_deals`; the original jpg from `mk_specs`). `mk_product` gives a 600 px `image` plus an `images` list (up to 4). Null/empty fields are omitted from results, `stock_status` only appears when it is not "موجود" (in stock), and review / comment text is cut to 400 characters (blog threads keep 3 replies, `more_replies` counts the rest).
 - **Ratings are 1–5**, `null` when nobody has reviewed the product yet.
 - **Persian queries match best** (`هندزفری`, `پاوربانک`), but English brand and model names work too (`xiaomi`, `Buds Pro`).
+- **Keyword listings ignore sort.** For a keyword use `mk_search` or `mk_find_cheapest`; use `mk_browse` with a category id, brand slug or tag id when you need sorting, a price range or filters.
+- **Rate limits:** the site's robots.txt disallows its API paths for crawlers, so keep request rates low (about one per second). The server already limits concurrency and adds a short delay.
+- **What it does not do:** no login, cart, orders, payment, wishlist or review posting; no other shops; no delivery to a specific address.
+- **Proxy:** set `MASTERKALA_MCP_PROXY` if you need one (see [Configuration](#configuration)).
 
 ## FAQ
 
@@ -207,7 +257,7 @@ delivery and deals. It calls the same public endpoints the masterkala.com websit
 <summary><b>How do I use MasterKala with Claude, Cursor or Copilot?</b></summary>
 
 Add the server with `claude mcp add masterkala -- uvx masterkala-mcp` (or the matching config in
-[Quick start](#quick-start) for Claude Desktop, Cursor and VS Code), then ask in plain language, in Persian or English.
+[Quick start](#quick-start) for Claude Desktop, Cursor, VS Code, Codex CLI, Gemini CLI and Windsurf), then ask in plain language, in Persian or English.
 </details>
 
 <details>
@@ -231,6 +281,12 @@ It keeps only items you can order online now, whose title contains every word of
 covers and screen protectors unless you ask for them (`include_accessories: true`, or a query like "کاور ...").
 It scans the first 500 results by default (in-stock items come first); `complete: false` in the reply means more
 in-stock items lie past that, so raise `scan` (up to 1500). `mk_search` shows everything.
+</details>
+
+<details>
+<summary><b>Are the prices in Rial or Toman?</b></summary>
+
+Toman. `final_price` is what the customer pays after discount. The site's structured data uses Rial, and the server converts it.
 </details>
 
 <details>
@@ -259,7 +315,7 @@ npx @modelcontextprotocol/inspector uvx masterkala-mcp
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `MASTERKALA_MCP_PROXY` | unset | HTTP proxy for every request, e.g. `http://user:pass@host:port`. A comma-separated list is used one at a time: the next proxy takes over when one is blocked or cannot connect |
+| `MASTERKALA_MCP_PROXY` | unset | Optional HTTP proxy URL for every request to masterkala.com, e.g. `http://user:pass@host:port`; system proxy settings are ignored. A comma-separated list is used one at a time: the next proxy takes over when one is blocked or cannot connect |
 
 <a id="فارسی"></a>
 
@@ -267,14 +323,27 @@ npx @modelcontextprotocol/inspector uvx masterkala-mcp
 
 <div dir="rtl">
 
-**masterkala-mcp** یک سرور MCP غیررسمی و فقط&zwnj;خواندنی برای مسترکالا، فروشگاه اینترنتی گجت و لوازم جانبی موبایل در ایران، است. این سرور به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در مسترکالا جستجو کند،
+**masterkala-mcp** یک سرور MCP غیررسمی و فقط&zwnj;خواندنی برای [مسترکالا](https://masterkala.com)، فروشگاه اینترنتی گجت و لوازم جانبی موبایل در ایران، است. این سرور به دستیار هوش مصنوعی شما (Claude، Cursor، Copilot و ...) اجازه می&zwnj;دهد در مسترکالا جستجو کند،
 ارزان&zwnj;ترین کالای موجود را پیدا کند، مشخصات و نظرات را مقایسه کند و زمان و هزینه ارسال و تخفیف&zwnj;های روز را ببیند.
 
-- فقط خواندنی است: وارد حساب نمی&zwnj;شود، سبد خرید نمی&zwnj;سازد، سفارش ثبت نمی&zwnj;کند و نظر نمی&zwnj;فرستد.
-- قیمت&zwnj;ها به تومان است و کاور و قاب را از نتایج «ارزان&zwnj;ترین» جدا می&zwnj;کند.
-- روی سیستم خود شما اجرا می&zwnj;شود و به هیچ سرور واسطی داده نمی&zwnj;فرستد.
+**چه کارهایی می&zwnj;کند**
 
-**نصب در Claude Code:**
+- جستجوی هندزفری، پاوربانک، شارژر، کابل، ساعت هوشمند و اسپیکر با قیمت، تخفیف و وضعیت موجودی.
+- پیدا کردن ارزان&zwnj;ترین کالای موجود برای یک عبارت، بدون کاور و قاب.
+- مرور دسته&zwnj;ها، برندها و برچسب&zwnj;ها با مرتب&zwnj;سازی و فیلتر قیمت، برند و رنگ.
+- مشخصات فنی، مقایسه تا ۴ کالا کنار هم، و نظرات خریداران با پاسخ فروشگاه.
+- زمان و هزینه ارسال به تهران و شهرهای دیگر (پست)، و شعب حضوری مسترکالا در تهران.
+- تخفیف&zwnj;های روز و مقاله&zwnj;های راهنمای خرید وبلاگ.
+
+**نکته&zwnj;ها**
+
+- فقط خواندنی است: وارد حساب نمی&zwnj;شود، سبد خرید نمی&zwnj;سازد، سفارش ثبت نمی&zwnj;کند و نظر نمی&zwnj;فرستد. خرید را خودتان در سایت انجام می&zwnj;دهید.
+- قیمت&zwnj;ها به تومان است و کاور و قاب را از نتایج «ارزان&zwnj;ترین» جدا می&zwnj;کند.
+- هزینه و زمان ارسال برآورد است، برای تهران و «سایر شهرها با پست»؛ آدرس دقیق پشتیبانی نمی&zwnj;شود.
+- کلید API لازم نیست؛ روی سیستم خود شما اجرا می&zwnj;شود و به هیچ سرور واسطی داده نمی&zwnj;فرستد.
+- اگر لازم بود، متغیر `MASTERKALA_MCP_PROXY` را روی یک پراکسی HTTP بگذارید.
+
+**نصب** (اول [uv](https://docs.astral.sh/uv/getting-started/installation/) را نصب کنید). در Claude Code:
 
 </div>
 
@@ -284,7 +353,15 @@ claude mcp add masterkala -- uvx masterkala-mcp
 
 <div dir="rtl">
 
-بعد بپرسید: «ارزان&zwnj;ترین هندزفری بلوتوث بین ۳ تا ۵ میلیون تومان کدام است و کی به تهران می&zwnj;رسد؟»
+در Claude Desktop، Cursor و بقیه برنامه&zwnj;ها همان تنظیم بخش [Quick start](#quick-start) را بگذارید.
+
+**نمونه پرسش&zwnj;ها**
+
+- «ارزان&zwnj;ترین هندزفری بلوتوث بین ۳ تا ۵ میلیون تومان کدام است و کی به تهران می&zwnj;رسد؟»
+- «بهترین تخفیف&zwnj;های امروز مسترکالا روی پاوربانک چیه؟»
+- «ارزان&zwnj;ترین پاوربانک شیائومی موجود را پیدا کن.»
+- «مشخصات دو ساعت هوشمند را مقایسه کن.»
+- «شعب مسترکالا در تهران کجاست؟»
 
 </div>
 
@@ -306,14 +383,17 @@ publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.i
 
 ## Related servers
 
+- [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp): catalog of all Iranian-service MCP servers
 - [Digikala MCP server](https://github.com/sepehr071/digikala-mcp) for Iran's largest online store
 - [Technolife MCP server](https://github.com/sepehr071/technolife-mcp) for electronics prices, with installment prices
-- [awesome-iran-mcp](https://github.com/sepehr071/awesome-iran-mcp): catalog of all Iranian-service MCP servers
+- [Torob MCP server](https://github.com/sepehr071/torob-mcp) for comparing prices across Iranian shops
+- [Okala MCP server](https://github.com/sepehr071/okala-mcp) for online grocery shopping
+- [Banimode MCP server](https://github.com/sepehr071/banimode-mcp) for fashion
 
 ## Disclaimer
 
-Unofficial and not affiliated with or endorsed by MasterKala. It uses the public endpoints of the masterkala.com
-website, which can change without notice. Please keep request rates reasonable.
+Unofficial and not affiliated with or endorsed by MasterKala. It is read-only and uses the public endpoints of the
+masterkala.com website, which can change without notice. Please keep request rates reasonable.
 
 ## License
 

@@ -1,13 +1,13 @@
 [project]
 name = "masterkala-mcp"
-version = "0.4.0"
+version = "0.4.1"
 description = "Unofficial read-only MCP server for MasterKala: search gadgets and accessories, compare prices and specs, find deals."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Sepehr Radmard", email = "sepehrr80@gmail.com" }]
 requires-python = ">=3.10"
-keywords = ["mcp", "model-context-protocol", "masterkala", "iran", "e-commerce", "shopping", "gadgets"]
+keywords = ["mcp", "mcp-server", "model-context-protocol", "ai-agents", "masterkala", "iran", "persian", "e-commerce", "shopping", "gadgets", "mobile-accessories", "price-comparison", "power-bank", "earbuds"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
