@@ -15,6 +15,7 @@ power banks and smart watches, compare real prices and specs, read reviews, chec
 [![CI](https://github.com/sepehr071/masterkala-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/sepehr071/masterkala-mcp/actions/workflows/ci.yml)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.sepehr071%2Fmasterkala--mcp-7c3aed)](https://registry.modelcontextprotocol.io/?q=masterkala-mcp)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)](https://github.com/sepehr071/masterkala-mcp/blob/main/LICENSE)
+[![mcpfarsi](https://mcpfarsi.ir/badge/masterkala.svg)](https://mcpfarsi.ir/servers/masterkala/)
 
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=masterkala&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJtYXN0ZXJrYWxhLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_masterkala--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=masterkala&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22masterkala-mcp%22%5D%7D)
@@ -389,6 +390,7 @@ publishes to PyPI and the [MCP Registry](https://registry.modelcontextprotocol.i
 - [Torob MCP server](https://github.com/sepehr071/torob-mcp) for comparing prices across Iranian shops
 - [Okala MCP server](https://github.com/sepehr071/okala-mcp) for online grocery shopping
 - [Banimode MCP server](https://github.com/sepehr071/banimode-mcp) for fashion
+- Listed on [mcpfarsi.ir](https://mcpfarsi.ir/servers/masterkala/), the Persian MCP marketplace
 
 ## Disclaimer
 

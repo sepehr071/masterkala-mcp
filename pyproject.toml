@@ -33,6 +33,7 @@ browser = ["patchright==1.63.0"]
 [project.urls]
 Homepage = "https://github.com/sepehr071/masterkala-mcp"
 Issues = "https://github.com/sepehr071/masterkala-mcp/issues"
+Website = "https://mcpfarsi.ir/servers/masterkala/"
 
 [project.scripts]
 masterkala-mcp = "masterkala_mcp.server:main"
