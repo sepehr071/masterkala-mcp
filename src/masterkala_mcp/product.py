@@ -14,9 +14,7 @@ from .catalog import _first, _text
 from .http import BASE, ApiError, api, clip, get_page
 from .registry import tool
 
-ProductId = Annotated[
-    int, Field(ge=1, le=10_000_000, description="MasterKala product id from mk_search / mk_browse, e.g. 24855.")
-]
+ProductId = Annotated[int, Field(ge=1, le=10_000_000, description="From mk_search / mk_browse, e.g. 24855.")]
 
 OPTION_NAMES = {"14": "color", "15": "warranty"}
 
@@ -24,13 +22,11 @@ OPTION_NAMES = {"14": "color", "15": "warranty"}
 @tool("Product details")
 async def mk_product(
     product_id: ProductId,
-    full_text: Annotated[bool, Field(description="Return the description uncut (default cuts at 300 chars).")] = False,
+    full_text: Annotated[bool, Field(description="Uncut description (default 300 chars).")] = False,
 ) -> dict[str, Any]:
-    """Get one product's full record: price and discount (Toman), stock status and count, colors and
-    which are buyable, brand, category path, rating, and the physical branches that have it.
+    """Get one product's full record: price (Toman), stock count, colors, category path, rating, branches.
 
-    Use after mk_search / mk_browse when the user picks a product. Specs table: mk_specs.
-    Reviews: mk_reviews. Delivery date and fee: mk_shipping.
+    Use after mk_search / mk_browse. Specs: mk_specs. Reviews: mk_reviews. Delivery: mk_shipping.
     """
     url, doc = await get_page(f"/product/{product_id}/x")  # any slug redirects to the canonical one
     ld = _json_ld(doc)
@@ -104,13 +100,13 @@ async def mk_product(
 async def mk_specs(
     product_ids: Annotated[
         list[Annotated[int, Field(ge=1, le=10_000_000)]],
-        Field(min_length=1, max_length=4, description="1 to 4 product ids, e.g. [27144, 20850]."),
+        Field(min_length=1, max_length=4, description="Product ids, e.g. [27144, 20850]."),
     ],
 ) -> dict[str, Any]:
-    """Get the specification table of 1-4 products side by side, with each product's stock count.
+    """Get the spec table of 1-4 products side by side, with stock counts.
 
-    Use for "battery life / Bluetooth version of X" or to compare products row by row. Each
-    spec row has one value per product id; a missing id means no value for that product. Ids that do not exist are listed in not_found.
+    Use for specs or comparison. Each row has one value per product id (missing = none).
+    Unknown ids: not_found.
     """
     data = await _attributes(product_ids)
     products = {str(p.get("product_id")): p for p in data.get("products") or []}
@@ -144,16 +140,13 @@ async def mk_specs(
 @tool("Product reviews")
 async def mk_reviews(
     product_id: ProductId,
-    stars: Annotated[int, Field(ge=0, le=5, description="Only reviews with this many stars (1-5); 0 = all.")] = 0,
-    limit: Annotated[int, Field(ge=1, le=100, description="Max reviews to return, newest first.")] = 20,
-    full_text: Annotated[
-        bool, Field(description="Return review and reply text uncut (default cuts at 400 chars).")
-    ] = False,
+    stars: Annotated[int, Field(ge=0, le=5, description="Only this many stars; 0 = all.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=100, description="Max reviews, newest first.")] = 20,
+    full_text: Annotated[bool, Field(description="Uncut text (default 400 chars).")] = False,
 ) -> dict[str, Any]:
-    """Read customer reviews of a product (1-5 stars, newest first) with the store's replies and the star breakdown.
+    """Read customer reviews of a product (newest first) with store replies and the star breakdown.
 
-    Use as a quality check before recommending a product. average and star_counts cover all
-    reviews; count is the number matching `stars`.
+    average and star_counts cover all reviews; count matches `stars`.
     """
     body = await _reviews(product_id, 0, stars)
     count, rows = int(body.get("count") or 0), body.get("list") or []
@@ -186,9 +179,8 @@ async def mk_reviews(
 async def mk_shipping(product_id: ProductId) -> dict[str, Any]:
     """Get the nearest delivery slot and shipping fee for one product: Tehran courier and post to other cities.
 
-    Use for "when will it arrive / how much is shipping". Fees are Toman, 0 = free; free above
-    free_shipping_from (null = never free). same_day_seconds_left > 0: can still arrive today in
-    Tehran. Estimates use a default Tehran address.
+    Fees in Toman, 0 = free; free above free_shipping_from (null = never). same_day_seconds_left > 0:
+    can still arrive today in Tehran.
     """
     errors: list[str] = []
     hint, badge = await asyncio.gather(
@@ -217,8 +209,7 @@ async def mk_shipping(product_id: ProductId) -> dict[str, Any]:
 async def mk_branches() -> dict[str, Any]:
     """List MasterKala's physical shops in Tehran with address, phone and map location.
 
-    Use when the user wants to buy in person. mk_product's `branches` says which shops have a
-    given product; call the shop before going, they stock only part of the catalog.
+    mk_product's `branches` says which shops have a given product.
     """
     _, doc = await get_page("/stores")
     branches = []

@@ -41,15 +41,14 @@ async def mk_blog_posts(
             "learn_more",
             "announcement",
         ],
-        Field(description="Blog section, e.g. 'buying_guide' (راهنمای خرید) or 'comparison_review' (مقایسه و بررسی)."),
+        Field(description="Blog section; buying_guide = راهنمای خرید."),
     ] = "buying_guide",
-    page: Annotated[int, Field(ge=0, le=200, description="Page number, from 0, newest first.")] = 0,
-    limit: Annotated[int, Field(ge=1, le=50, description="Posts per page.")] = 10,
+    page: Annotated[int, Field(ge=0, le=200, description="From 0.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=50, description="Per page.")] = 10,
 ) -> dict[str, Any]:
     """List MasterKala blog posts (buying guides, comparisons, how-tos), newest first, with links.
 
-    Use when the user asks which product type to choose or how to use a gadget: point them to
-    the matching guide. Readers' questions answered by the store: mk_blog_comments.
+    Use for which-type-to-choose or how-to questions. Readers' Q&A: mk_blog_comments.
     """
     body: dict[str, Any] = {"from": page * limit, "limit": str(limit)}
     if category != "all":
@@ -74,11 +73,9 @@ async def mk_blog_posts(
 
 @tool("Blog post comments")
 async def mk_blog_comments(
-    post_id: Annotated[int, Field(ge=1, le=1_000_000, description="Blog post id from mk_blog_posts, e.g. 330.")],
-    limit: Annotated[int, Field(ge=1, le=20, description="Max comment threads to return, newest first.")] = 10,
-    full_text: Annotated[
-        bool, Field(description="Return comment text uncut and all replies (default: 400 chars, 3 replies).")
-    ] = False,
+    post_id: Annotated[int, Field(ge=1, le=1_000_000, description="From mk_blog_posts, e.g. 330.")],
+    limit: Annotated[int, Field(ge=1, le=20, description="Max threads, newest first.")] = 10,
+    full_text: Annotated[bool, Field(description="Uncut text and all replies (default 400 chars, 3 replies).")] = False,
 ) -> dict[str, Any]:
     """Read the comments of a blog post as threads, with the store writer's answers as replies.
 

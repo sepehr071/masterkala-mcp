@@ -17,17 +17,15 @@ Query = Annotated[
     Field(
         min_length=2,
         max_length=100,
-        description="Product name or keyword, Persian or English, e.g. 'هندزفری بلوتوث' or 'xiaomi'.",
+        description="Persian or English keyword, e.g. 'هندزفری بلوتوث'.",
     ),
 ]
-CategoryId = Annotated[
-    int | None, Field(ge=1, description="Category id from mk_categories or mk_search, e.g. 606 (Bluetooth earbuds).")
-]
+CategoryId = Annotated[int | None, Field(ge=1, description="From mk_categories or mk_search, e.g. 606.")]
 BrandSlug = Annotated[
     str | None,
-    Field(pattern=r"^[A-Za-z0-9-]{2,40}$", description="Brand slug from mk_brands, e.g. 'mcdodo' or 'anker-fa'."),
+    Field(pattern=r"^[A-Za-z0-9-]{2,40}$", description="From mk_brands, e.g. 'mcdodo'."),
 ]
-TagId = Annotated[int | None, Field(ge=1, description="Tag id from a /tag/<id>/ link in mk_search pages, e.g. 22246.")]
+TagId = Annotated[int | None, Field(ge=1, description="From /tag/<id>/ links, e.g. 22246.")]
 
 FREE_SHIPPING_FROM = 5_000_000  # Toman, basket total
 IN_STOCK_TEXT = "موجود"  # stock_status of every buyable item; only other values are worth sending
@@ -47,19 +45,15 @@ async def mk_search(
     query: Query,
     in_stock_only: Annotated[
         bool,
-        Field(
-            description="Drop items that cannot be bought online now. In-stock items come first, so an empty page "
-            "means no more in-stock matches (total still counts all matches)."
-        ),
+        Field(description="Drop items not buyable now (total still counts all matches)."),
     ] = False,
-    page: Annotated[int, Field(ge=0, le=50, description="Page number, from 0.")] = 0,
+    page: Annotated[int, Field(ge=0, le=50, description="From 0.")] = 0,
     limit: Annotated[int, Field(ge=1, le=30, description="Products per page.")] = 10,
 ) -> dict[str, Any]:
     """Search MasterKala products by keyword: price, discount and stock of each match.
 
-    Use first for "price of X" / "do you have X". In-stock items come first. Also returns
-    matching categories (ids for mk_browse) and brand/tag pages. Cheapest: mk_find_cheapest.
-    One product: mk_product.
+    Use first for "price of X". In-stock first. Also returns matching categories (ids for
+    mk_browse) and brand/tag pages.
     """
     data = await _search(query, page * limit, limit)
     products = [_search_product(p) for p in data.get("products") or []]
@@ -79,28 +73,19 @@ async def mk_find_cheapest(
     query: Query,
     scan: Annotated[
         int,
-        Field(
-            ge=20,
-            le=1500,
-            description="Max search results to scan, 500 per request; stops early once the in-stock items end.",
-        ),
+        Field(ge=20, le=1500, description="Max results to scan, 500 per request."),
     ] = 500,
-    match_all_words: Annotated[
-        bool, Field(description="Keep only titles that contain every word of the query.")
-    ] = True,
+    match_all_words: Annotated[bool, Field(description="Keep only titles containing every query word.")] = True,
     include_accessories: Annotated[
         bool,
-        Field(
-            description="Also keep cases, covers, screen protectors and straps made for the product (dropped by default unless the query names them)."
-        ),
+        Field(description="Keep cases, covers, protectors, straps (dropped unless the query names them)."),
     ] = False,
-    limit: Annotated[int, Field(ge=1, le=50, description="Max offers to return.")] = 20,
+    limit: Annotated[int, Field(ge=1, le=50, description="Max offers.")] = 20,
 ) -> dict[str, Any]:
-    """Find the cheapest in-stock products for a keyword, one flat list sorted by payable price.
+    """Find the cheapest in-stock products for a keyword, one flat list sorted by final_price.
 
-    Use when the user wants the lowest price for X: scans the results, keeps items buyable online
-    now, sorts by final_price. free_shipping = basket reaches 5,000,000 Toman (bulky items never);
-    exact fee and date: mk_shipping. complete=false: in-stock items go past `scanned`, raise scan.
+    Use for the lowest price of X. free_shipping = reaches 5,000,000 Toman (bulky items never).
+    complete=false: more in-stock items past `scanned`; raise scan.
     """
     found: list[dict[str, Any]] = []
     while len(found) < scan:  # in-stock items come first: stop at the first page that reaches out-of-stock ones
@@ -142,29 +127,23 @@ async def mk_browse(
     tag_id: TagId = None,
     sort: Annotated[
         Literal["cheapest", "most_expensive", "most_stock", "newest"],
-        Field(description="Order of the listing. In-stock items always come first."),
+        Field(description="In-stock items always come first."),
     ] = "cheapest",
-    min_price: Annotated[
-        int | None, Field(ge=0, description="Minimum payable price (final_price) in Toman, e.g. 3000000.")
-    ] = None,
-    max_price: Annotated[
-        int | None, Field(ge=1, description="Maximum payable price (final_price) in Toman, e.g. 5000000.")
-    ] = None,
+    min_price: Annotated[int | None, Field(ge=0, description="Min final_price, Toman.")] = None,
+    max_price: Annotated[int | None, Field(ge=1, description="Max final_price, Toman.")] = None,
     filter_ids: Annotated[
         list[Annotated[str, Field(pattern=r"^[mo]?\d{1,6}$")]] | None,
         Field(
             max_length=10,
-            description="Filter ids from mk_filters: 'm30' brand, 'o78' color, '117' attribute. Example: ['m30', 'o52'].",
+            description="Ids from mk_filters: 'm30' brand, 'o78' color, '117' attribute.",
         ),
     ] = None,
-    page: Annotated[int, Field(ge=0, le=100, description="Page number, from 0.")] = 0,
-    limit: Annotated[int, Field(ge=1, le=40, description="Products per page.")] = 24,
+    page: Annotated[int, Field(ge=0, le=100, description="From 0.")] = 0,
+    limit: Annotated[int, Field(ge=1, le=40, description="Per page.")] = 24,
 ) -> dict[str, Any]:
     """List the products of a category, brand or tag with sorting, price range and filters.
 
-    Use for "cheapest Bluetooth earbuds", "Xiaomi power banks between 1 and 2 million Toman".
-    Pass exactly one of category_id / brand / tag_id (ids: mk_categories, mk_brands, mk_search;
-    filter ids: mk_filters). No keyword or rating sort here: see mk_search / mk_reviews.
+    Pass exactly one of category_id / brand / tag_id. No keyword search here: mk_search.
     """
     sources = {"cat": category_id, "manufacturer": brand, "tag": tag_id}
     if sum(v is not None for v in sources.values()) != 1:
@@ -212,16 +191,13 @@ async def mk_filters(
     tag_id: TagId = None,
     group: Annotated[
         str | None,
-        Field(
-            min_length=2, description="Return only this filter group, in full, e.g. 'رنگ' (color) or 'برند' (brand)."
-        ),
+        Field(min_length=2, description="Only this group, in full, e.g. 'رنگ' (color)."),
     ] = None,
 ) -> dict[str, Any]:
-    """List the filters of a category, brand or tag page (brands, colors, attributes) with their ids, and its price range.
+    """List the filters of a category, brand or tag page with their ids, and its price range.
 
-    Use before mk_browse for a brand, color or feature filter: options map filter id -> name; pass
-    the ids as filter_ids. Non-brand groups are cut to 40 options (`omitted` = the rest): pass
-    `group` for all. max_price = most expensive item (Toman).
+    Use before mk_browse; options map filter id -> name. Non-brand groups are cut to 40
+    (`omitted` = rest): pass `group` for all. max_price in Toman.
     """
     if sum(v is not None for v in (category_id, brand, tag_id)) != 1:
         raise ApiError("Pass exactly one of category_id, brand or tag_id.")
@@ -263,15 +239,12 @@ async def mk_filters(
 async def mk_categories(
     query: Annotated[
         str | None,
-        Field(
-            min_length=2, description="Optional filter on the Persian name or English slug, e.g. 'شارژر' or 'charger'."
-        ),
+        Field(min_length=2, description="Filter on Persian name or English slug, e.g. 'شارژر'."),
     ] = None,
 ) -> dict[str, Any]:
-    """List MasterKala's product categories with their ids (about 100 main categories).
+    """List MasterKala's product categories with their ids (about 100).
 
-    Use to get a category_id for mk_browse / mk_filters. mk_search also returns the
-    categories matching a keyword.
+    Use to get a category_id for mk_browse / mk_filters.
     """
     categories = await cached("categories", _all_categories)
     if query:
@@ -284,12 +257,12 @@ async def mk_categories(
 async def mk_brands(
     query: Annotated[
         str | None,
-        Field(min_length=2, description="Optional filter on the brand name, English only, e.g. 'xiaomi' or 'anker'."),
+        Field(min_length=2, description="Filter on brand name, English, e.g. 'xiaomi'."),
     ] = None,
 ) -> dict[str, Any]:
     """List the brands MasterKala sells with their slugs (about 135).
 
-    Use to get the brand slug for mk_browse / mk_filters ('anker-fa', 'mcdodo').
+    Use to get the brand slug for mk_browse / mk_filters.
     """
     brands = await cached("brands", _all_brands)
     if query:
@@ -300,12 +273,11 @@ async def mk_brands(
 
 @tool("Current deals")
 async def mk_deals(
-    limit: Annotated[int, Field(ge=1, le=100, description="Max deals to return.")] = 30,
+    limit: Annotated[int, Field(ge=1, le=100, description="Max deals.")] = 30,
 ) -> dict[str, Any]:
-    """List every product on MasterKala's discount page right now, biggest discount first.
+    """List products on MasterKala's discount page, biggest discount first.
 
-    Use for "what's on sale" / "best discounts today". ends_in_seconds is the time left in the
-    current offer period. Discounts inside one keyword or category: mk_search / mk_browse.
+    ends_in_seconds = time left in the current offer period.
     """
     _, doc = await get_page("/offer")
     timer = _first(r"countdown:\s*\{\s*timer:\s*(\d+)", doc)
