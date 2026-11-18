@@ -20,7 +20,7 @@ power banks and smart watches, compare real prices and specs, read reviews, chec
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=masterkala&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJtYXN0ZXJrYWxhLW1jcCJdfQ==)
 [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_masterkala--mcp-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=masterkala&config=%7B%22command%22%3A%22uvx%22%2C%22args%22%3A%5B%22masterkala-mcp%22%5D%7D)
 
-[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [How it works](#how-it-works) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers)
+[For AI agents](#for-ai-agents) · [Why](#why) · [What it can do](#what-it-can-do) · [Quick start](#quick-start) · [Tools](#tools) · [Good to know](#good-to-know) · [FAQ](#faq) · [Configuration](#configuration) · [فارسی](#فارسی) · [Development](#development) · [Related servers](#related-servers)
 
 </div>
 
@@ -212,25 +212,6 @@ All tools are prefixed `mk_`. Product ids are numbers like `24855`; category ids
 </details>
 
 All 14 tools are annotated `readOnlyHint: true` and return compact JSON, so they don't flood the agent's context.
-
-## How it works
-
-```text
-  AI agent  (Claude, Cursor, Copilot, ...)
-      │
-      │  MCP over stdio
-      ▼
-  masterkala-mcp  (runs on your machine)
-      │
-      │  HTTPS
-      └──────▶  masterkala.com   JSON API, listing fragments, product pages
-```
-
-`masterkala-mcp` runs locally and calls the same public endpoints the masterkala.com website uses.
-There's no hosted server in between, no API key, and nothing about you is sent anywhere else.
-Requests go out through a Chrome-impersonating HTTP client, at most 2 at a time with a short random delay, and a dropped
-connection is retried up to twice. The category and brand lists are cached for an hour. Review, comment and description
-text is treated as untrusted site content and cut to a short length.
 
 ## Good to know
 
